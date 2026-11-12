@@ -22,6 +22,15 @@ For other platforms, see [activitywatch.net/downloads](https://activitywatch.net
 
 Install the app from the [Play Store](https://play.google.com/store/apps/details?id=net.activitywatch.android), [F-Droid](https://f-droid.org/en/packages/net.activitywatch.android/), or the [GitHub releases](https://github.com/ActivityWatch/aw-android/releases).
 
+### Automations (call a web API when an app opens or closes)
+
+Open the menu → **Automations** to set up IF/THEN rules:
+
+- **IF** an app session *starts*, *ends*, or either, for **a specific app**, **an Android app category** (Games, Social, Video, …), **an ActivityWatch category** (from your own categorization rules, subcategories included), or **any app**. Close rules can ignore sessions shorter than a minimum length.
+- **THEN** send an HTTP request (`POST`/`GET`/`PUT`/`PATCH`/`DELETE`) to any `https://` URL, with your own headers and body. Placeholders such as `{{event}}`, `{{app}}`, `{{package}}`, `{{category}}`, `{{timestamp}}` and `{{duration_seconds}}` are filled in (JSON-escaped in JSON bodies, URL-encoded in the URL). Use **Test** to send one right away.
+
+Detection uses the usage-access permission the app already has, checked every second by default (adjustable from 0.5 s to 10 s) while the screen is on and at least one automation is enabled. If you also enable the ActivityWatch accessibility service, app switches are picked up as they happen (typically well under a second). Each automation shows the result of its last run.
+
 ### For Oculus Quest
 
 > **Note** 

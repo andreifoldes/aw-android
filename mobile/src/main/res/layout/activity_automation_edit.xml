@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/et_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/automation_name_hint"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences" />
+
+        <!-- IF -->
+        <TextView
+            style="@style/AutomationSectionHeading"
+            android:text="@string/automation_if" />
+
+        <TextView
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_when_label" />
+
+        <Spinner
+            android:id="@+id/spinner_trigger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp" />
+
+        <TextView
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_target_type_label" />
+
+        <Spinner
+            android:id="@+id/spinner_target_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:id="@+id/tv_target_value_label"
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_target_app_label" />
+
+        <Spinner
+            android:id="@+id/spinner_target_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:id="@+id/tv_target_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/row_min_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/automation_min_duration_label"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/et_min_duration"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:hint="0"
+                android:importantForAutofill="no"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <!-- THEN -->
+        <TextView
+            style="@style/AutomationSectionHeading"
+            android:text="@string/automation_then" />
+
+        <TextView
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_method_label" />
+
+        <Spinner
+            android:id="@+id/spinner_method"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/et_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/automation_url_hint"
+            android:importantForAutofill="no"
+            android:inputType="textUri" />
+
+        <TextView
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_headers_label" />
+
+        <EditText
+            android:id="@+id/et_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:gravity="top|start"
+            android:hint="@string/automation_headers_hint"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:minLines="2"
+            android:textSize="13sp" />
+
+        <TextView
+            style="@style/AutomationFieldLabel"
+            android:text="@string/automation_body_label" />
+
+        <EditText
+            android:id="@+id/et_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:gravity="top|start"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:minLines="6"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_placeholders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <TextView
+            android:id="@+id/tv_test_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_delete"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/automation_delete" />
+
+            <Button
+                android:id="@+id/btn_test"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/automation_test" />
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/automation_save" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

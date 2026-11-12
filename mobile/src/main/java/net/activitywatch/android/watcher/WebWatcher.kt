@@ -22,6 +22,7 @@ import net.activitywatch.android.RustInterface
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
 import net.activitywatch.android.AWPreferences
+import net.activitywatch.android.automation.AppSessionMonitor
 import org.json.JSONObject
 
 private fun extractTextByViewId(
@@ -210,6 +211,13 @@ class WebWatcher : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (shouldIgnoreEvent(event)) {
             return
+        }
+
+        // Fast path for app-session automations: a window change usually means the
+        // foreground app changed, so have the monitor read usage events now instead of
+        // waiting for its next poll.
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            AppSessionMonitor.poke()
         }
 
         val packageName = event.packageName?.toString()
