@@ -135,6 +135,12 @@ jobs:
       fail-fast: true
       matrix:
         type: ['apk', 'aab']
+    env:
+      # Pin where AGP creates the debug keystore, which is also where
+      # scripts/sign_apk_debug.sh looks for it to re-sign per-ABI debug APKs.
+      # Without this the two can disagree on a runner image whose Android
+      # preferences dir isn't ~/.android (seen on GitHub-hosted ubuntu-24.04).
+      ANDROID_USER_HOME: ${{ github.workspace }}/.android-user
 
     steps:
     - uses: actions/checkout@v4
@@ -264,6 +270,7 @@ jobs:
         JKS_STOREPASS: ${{ secrets.KEY_ANDROID_JKS_STOREPASS }}
         JKS_KEYPASS: ${{ secrets.KEY_ANDROID_JKS_KEYPASS }}
       run: |
+        mkdir -p "$ANDROID_USER_HOME"
         if [ "${{ matrix.type }}" = apk ]; then
           # Per-ABI APKs first: signing dist/aw-android.apk moves the Gradle
           # output away, and build-apk-per-abi reads that same file (aw-android#61).
