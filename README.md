@@ -27,7 +27,7 @@ Install the app from the [Play Store](https://play.google.com/store/apps/details
 Open the menu → **Automations** to set up IF/THEN rules:
 
 - **IF** an app session *starts*, *ends*, or either, for **a specific app**, **an Android app category** (Games, Social, Video, …), **an ActivityWatch category** (from your own categorization rules, subcategories included), or **any app**. Close rules can ignore sessions shorter than a minimum length.
-- **THEN** send an HTTP request (`POST`/`GET`/`PUT`/`PATCH`/`DELETE`) to any `https://` URL, with your own headers and body. Placeholders such as `{{event}}`, `{{app}}`, `{{package}}`, `{{category}}`, `{{timestamp}}` and `{{duration_seconds}}` are filled in (JSON-escaped in JSON bodies, URL-encoded in the URL). Use **Test** to send one right away.
+- **THEN** send an HTTP request (`POST`/`GET`/`PUT`/`PATCH`/`DELETE`) with your own headers and body. Like iOS Shortcuts, `https://` works with any address and plain `http://` works on your local network (e.g. `http://192.168.1.10:8123`, `http://homeassistant.local:8123`); an `http://` request is only sent once its host resolves to a local-network address. Placeholders such as `{{event}}`, `{{app}}`, `{{package}}`, `{{category}}`, `{{timestamp}}` and `{{duration_seconds}}` are filled in (JSON-escaped in JSON bodies, URL-encoded in the URL). Use **Test** to send one right away.
 
 Detection uses the usage-access permission the app already has, checked every second by default (adjustable from 0.5 s to 10 s) while the screen is on and at least one automation is enabled. If you also enable the ActivityWatch accessibility service, app switches are picked up as they happen (typically well under a second). Each automation shows the result of its last run.
 

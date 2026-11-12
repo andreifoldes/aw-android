@@ -110,6 +110,13 @@
             android:inputType="textUri" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/automation_url_help"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <TextView
             style="@style/AutomationFieldLabel"
             android:text="@string/automation_headers_label" />
 

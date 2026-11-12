@@ -8,6 +8,7 @@ import android.util.Log
 import net.activitywatch.android.deviceHostname
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.InetAddress
 import java.net.URL
 import java.time.Instant
 import java.util.concurrent.ExecutorService
@@ -167,13 +168,21 @@ object HttpActionRunner {
         return AutomationStore.RunResult(System.currentTimeMillis(), false, "Failed: ${describe(lastError)}")
     }
 
+    /** Thrown for http:// to a non-local address; not retried. */
+    class CleartextNotAllowed(message: String) : Exception(message)
+
     private fun send(method: String, url: String, headers: List<Pair<String, String>>, body: String): Int {
-        val conn = URL(url).openConnection() as HttpURLConnection
+        val parsed = URL(url)
+        val cleartext = parsed.protocol.equals("http", ignoreCase = true)
+        if (cleartext) requireLocalHost(parsed.host)
+        val conn = parsed.openConnection() as HttpURLConnection
         try {
             conn.connectTimeout = CONNECT_TIMEOUT_MS
             conn.readTimeout = READ_TIMEOUT_MS
             conn.requestMethod = method
-            conn.instanceFollowRedirects = true
+            // A redirect target is not re-checked, so a plain-http request must not be
+            // bounced to the internet. (https never follows a redirect down to http.)
+            conn.instanceFollowRedirects = !cleartext
             headers.forEach { (k, v) -> conn.setRequestProperty(k, v) }
             // HttpURLConnection silently turns a GET with a body into a POST, so GET never sends one.
             if (method != "GET" && body.isNotBlank()) {
@@ -191,6 +200,21 @@ object HttpActionRunner {
             return code
         } finally {
             conn.disconnect()
+        }
+    }
+
+    /**
+     * Plain http:// is only for the local network: every address the host resolves to must
+     * be local. Throws UnknownHostException (an IOException, so retried) if DNS fails.
+     */
+    private fun requireLocalHost(host: String) {
+        val addresses = InetAddress.getAllByName(host)
+        val public = addresses.firstOrNull { !LocalNetwork.isLocalAddress(it) }
+        if (public != null) {
+            throw CleartextNotAllowed(
+                "plain http:// is only allowed on your local network, but $host is " +
+                    "${public.hostAddress}. Use https:// for internet addresses."
+            )
         }
     }
 

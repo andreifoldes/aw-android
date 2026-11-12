@@ -22,6 +22,7 @@ import net.activitywatch.android.automation.AutomationRule
 import net.activitywatch.android.automation.AutomationStore
 import net.activitywatch.android.automation.AwCategories
 import net.activitywatch.android.automation.HttpActionRunner
+import net.activitywatch.android.automation.LocalNetwork
 import net.activitywatch.android.automation.RequestTemplate
 import net.activitywatch.android.automation.SessionTransition
 import net.activitywatch.android.automation.TargetType
@@ -322,17 +323,27 @@ class AutomationEditActivity : AppCompatActivity() {
         val scheme = probe.scheme?.lowercase()
         if (scheme != "https" && scheme != "http") return "URL must start with https:// or http://"
         if (probe.host.isNullOrEmpty()) return "URL is missing a host"
-        // network_security_config only permits cleartext to this device.
-        if (scheme == "http" && probe.host !in listOf("localhost", "127.0.0.1")) {
-            return "Android blocks plain http:// except to this device. Use https://"
+        // Like iOS Shortcuts: https:// anywhere, plain http:// on the local network only.
+        // The send-time check on the resolved address is authoritative (HttpActionRunner).
+        if (scheme == "http" && LocalNetwork.classifyHost(probe.host!!) == LocalNetwork.HostKind.PUBLIC) {
+            return "Plain http:// only works on your local network. Use https:// for internet addresses."
         }
         return null
+    }
+
+    /** A note for http:// names we can't classify until they are resolved at send time. */
+    private fun cleartextNotice(url: String): String? {
+        val probe = Uri.parse(url.replace(Regex("""\{\{[^}]*\}\}"""), "x"))
+        if (probe.scheme?.lowercase() != "http") return null
+        val host = probe.host ?: return null
+        if (LocalNetwork.classifyHost(host) != LocalNetwork.HostKind.UNKNOWN) return null
+        return "Plain http:// requests to $host are only sent if it resolves to a local-network address."
     }
 
     private fun save() {
         val rule = ruleFromForm() ?: return
         store.saveRule(rule)
-        Toast.makeText(this, "Automation saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, cleartextNotice(rule.url) ?: "Automation saved", Toast.LENGTH_LONG).show()
         finish()
     }
 
