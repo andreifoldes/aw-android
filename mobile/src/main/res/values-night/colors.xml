@@ -16,4 +16,18 @@
     <color name="widget_text_muted">#888888</color>
     <color name="widget_bar_bg">#424242</color>
     <color name="widget_icon_tint">#888888</color>
+
+    <!-- Automations editor (dark). -->
+    <color name="automation_screen_bg">#000000</color>
+    <color name="automation_card_bg">#1C1C1E</color>
+    <color name="automation_field_bg">#2C2C2E</color>
+    <color name="automation_divider">#38383A</color>
+    <color name="automation_segment_track">#2C2C2E</color>
+    <color name="automation_segment_selected">#636366</color>
+    <color name="automation_chip_bg">#3B1E2A</color>
+    <color name="automation_chip_text">#FF6F9F</color>
+    <color name="automation_text_primary">#FFFFFF</color>
+    <color name="automation_text_secondary">#8E8E93</color>
+    <color name="automation_remove">#FF453A</color>
+    <color name="automation_action_icon_bg">#1E88E5</color>
 </resources>

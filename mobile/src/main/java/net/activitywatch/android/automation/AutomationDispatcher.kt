@@ -54,10 +54,7 @@ class AutomationDispatcher(
         if (rules.isEmpty()) return
         // Categorizing may hit the datastore, so only do it when a rule matches on it or
         // its request mentions {{category}}.
-        val wantsCategory = rules.any { r ->
-            r.targetType == TargetType.AW_CATEGORY ||
-                listOf(r.url, r.headers, r.body).any { "category" in it }
-        }
+        val wantsCategory = rules.any { r -> r.targetType == TargetType.AW_CATEGORY || r.mentions("category") }
         val app = describeApp(appContext, transition.packageName, if (wantsCategory) categories() else null)
         for (rule in rules) {
             if (!rule.matches(transition, app)) continue
@@ -140,19 +137,16 @@ object HttpActionRunner {
     private const val RETRY_DELAY_MS = 2_000L
 
     fun execute(rule: AutomationRule, vars: Map<String, String>): AutomationStore.RunResult {
-        val url = RequestTemplate.render(rule.url.trim(), vars, RequestTemplate.Escape.URL)
-        val headers = RequestTemplate.parseHeaders(rule.headers).map { (k, v) ->
-            k to RequestTemplate.render(v, vars, RequestTemplate.Escape.NONE).replace(Regex("[\r\n]"), " ")
-        }
-        val body = RequestTemplate.render(rule.body, vars, RequestTemplate.bodyEscape(headers, rule.body))
-        val method = rule.method.uppercase()
+        val request = RequestBuilder.build(rule, vars)
+        val method = request.method
+        val url = request.url
 
         // One retry covers a request fired just as the network comes back (e.g. on unlock).
         var lastError: Exception? = null
         repeat(2) { attempt ->
             if (attempt > 0) Thread.sleep(RETRY_DELAY_MS)
             try {
-                val code = send(method, url, headers, body)
+                val code = send(request)
                 val ok = code in 200..299
                 Log.i("HttpActionRunner", "${rule.name}: $method $url -> HTTP $code")
                 return AutomationStore.RunResult(System.currentTimeMillis(), ok, "HTTP $code")
@@ -171,7 +165,8 @@ object HttpActionRunner {
     /** Thrown for http:// to a non-local address; not retried. */
     class CleartextNotAllowed(message: String) : Exception(message)
 
-    private fun send(method: String, url: String, headers: List<Pair<String, String>>, body: String): Int {
+    private fun send(request: BuiltRequest): Int {
+        val (method, url, headers, body) = request
         val parsed = URL(url)
         val cleartext = parsed.protocol.equals("http", ignoreCase = true)
         if (cleartext) requireLocalHost(parsed.host)
@@ -185,7 +180,7 @@ object HttpActionRunner {
             conn.instanceFollowRedirects = !cleartext
             headers.forEach { (k, v) -> conn.setRequestProperty(k, v) }
             // HttpURLConnection silently turns a GET with a body into a POST, so GET never sends one.
-            if (method != "GET" && body.isNotBlank()) {
+            if (body != null) {
                 val bytes = body.toByteArray(Charsets.UTF_8)
                 conn.doOutput = true
                 conn.setFixedLengthStreamingMode(bytes.size)

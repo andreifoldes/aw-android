@@ -15,19 +15,23 @@ object RequestTemplate {
 
     enum class Escape { NONE, JSON, URL }
 
-    /** Placeholder names, with a short description for the editor's help text. */
-    val PLACEHOLDERS: List<Pair<String, String>> = listOf(
-        "event" to "\"opened\" or \"closed\"",
-        "app" to "app name",
-        "package" to "package name",
-        "category" to "ActivityWatch category, e.g. Work > Programming",
-        "android_category" to "Android app category, e.g. Game",
-        "timestamp" to "when it happened (ISO 8601, UTC)",
-        "epoch_ms" to "when it happened (Unix ms)",
-        "session_start" to "session start (ISO 8601, UTC)",
-        "duration_seconds" to "session length in seconds (0 on open)",
-        "rule" to "this automation's name",
-        "device" to "device hostname",
+    /** A value the request can include, shown as a tappable chip in the editor. */
+    data class Placeholder(val name: String, val label: String, val description: String) {
+        val token: String get() = "{{$name}}"
+    }
+
+    val PLACEHOLDERS: List<Placeholder> = listOf(
+        Placeholder("app", "App", "app name"),
+        Placeholder("event", "Event", "\"opened\" or \"closed\""),
+        Placeholder("package", "Package", "package name"),
+        Placeholder("category", "Category", "ActivityWatch category, e.g. Work > Programming"),
+        Placeholder("android_category", "Android category", "Android app category, e.g. Game"),
+        Placeholder("timestamp", "Timestamp", "when it happened (ISO 8601, UTC)"),
+        Placeholder("epoch_ms", "Epoch ms", "when it happened (Unix ms)"),
+        Placeholder("session_start", "Session start", "session start (ISO 8601, UTC)"),
+        Placeholder("duration_seconds", "Duration (s)", "session length in seconds (0 on open)"),
+        Placeholder("rule", "Automation", "this automation's name"),
+        Placeholder("device", "Device", "device hostname"),
     )
 
     private val PLACEHOLDER = Regex("""\{\{\s*([a-zA-Z_]+)\s*\}\}""")
@@ -77,7 +81,8 @@ object RequestTemplate {
         if (contentType != null) {
             return if (contentType.contains("json", ignoreCase = true)) Escape.JSON else Escape.NONE
         }
-        val trimmed = body.trimStart()
+        // A leading {{placeholder}} also starts with "{", so look past placeholders.
+        val trimmed = PLACEHOLDER.replace(body, "x").trimStart()
         return if (trimmed.startsWith("{") || trimmed.startsWith("[")) Escape.JSON else Escape.NONE
     }
 }

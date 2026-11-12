@@ -71,5 +71,8 @@ class RequestTemplateTest {
     fun bodyEscapeSniffsJsonWithoutContentType() {
         assertEquals(Escape.JSON, RequestTemplate.bodyEscape(emptyList(), "  {\"a\": 1}"))
         assertEquals(Escape.NONE, RequestTemplate.bodyEscape(emptyList(), "app={{app}}"))
+        // Starts with "{" only because of a placeholder: not JSON.
+        assertEquals(Escape.NONE, RequestTemplate.bodyEscape(emptyList(), "{{event}}: {{app}}"))
+        assertEquals(Escape.JSON, RequestTemplate.bodyEscape(emptyList(), "{\"e\": \"{{event}}\"}"))
     }
 }

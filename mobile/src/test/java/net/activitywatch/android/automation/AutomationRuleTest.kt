@@ -76,11 +76,33 @@ class AutomationRuleTest {
             minDurationSeconds = 10,
             method = "PUT",
             url = "https://example.com/{{event}}",
-            headers = "X-Token: abc",
-            body = "{\"a\": \"{{app}}\"}",
+            headers = listOf(KeyValue("X-Token", "abc"), KeyValue("Accept", "*/*")),
+            bodyType = BodyType.FORM,
+            bodyFields = listOf(BodyField("a", "{{app}}"), BodyField("n", "1", FieldType.NUMBER)),
+            body = "raw",
         )
         val restored = AutomationRule.listFromJson(AutomationRule.listToJson(listOf(rule)))
         assertEquals(listOf(rule), restored)
+    }
+
+    @Test
+    fun readsEarlierFormatWithTextHeadersAndRawBody() {
+        val legacy = org.json.JSONObject(
+            """{"id":"1","url":"https://x.test","headers":"Content-Type: application/json\nX-A: b","body":"{\"a\":1}"}"""
+        )
+        val rule = AutomationRule.fromJson(legacy)
+        assertEquals(listOf(KeyValue("Content-Type", "application/json"), KeyValue("X-A", "b")), rule.headers)
+        assertEquals(BodyType.TEXT, rule.bodyType)
+        assertEquals("{\"a\":1}", rule.body)
+    }
+
+    @Test
+    fun mentionsLooksAtEveryPartOfTheRequest() {
+        val base = AutomationRule(url = "https://x.test", bodyFields = emptyList())
+        assertFalse(base.mentions("category"))
+        assertTrue(base.copy(headers = listOf(KeyValue("X-Cat", "{{category}}"))).mentions("category"))
+        assertTrue(base.copy(bodyFields = listOf(BodyField("c", "{{category}}"))).mentions("category"))
+        assertTrue(base.copy(url = "https://x.test/{{category}}").mentions("category"))
     }
 
     @Test
@@ -104,6 +126,8 @@ class AutomationRuleTest {
             targetValue = "com.example.game", targetLabel = "Game", method = "POST", url = "https://h.test/x",
         )
         assertEquals("When Game opens → POST https://h.test/x", rule.summary())
+        assertEquals("When Game opens", rule.whenSummary())
+        assertEquals("POST https://h.test/x", rule.doSummary())
     }
 
     @Test

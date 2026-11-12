@@ -84,11 +84,11 @@ class AutomationStore(context: Context) {
 
         /** Choices offered in the polling dropdown: (ms, label). */
         val POLL_INTERVAL_CHOICES: List<Pair<Long, String>> = listOf(
-            500L to "Every 0.5 s (fastest, more battery)",
-            1000L to "Every 1 s (default)",
+            500L to "Every 0.5 s",
+            1000L to "Every 1 s",
             2000L to "Every 2 s",
             5000L to "Every 5 s",
-            10_000L to "Every 10 s (least battery)",
+            10_000L to "Every 10 s",
         )
     }
 }
