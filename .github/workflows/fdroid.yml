@@ -75,9 +75,8 @@ jobs:
         make aw-server-rust
         python3 scripts/check-jnilibs.py
 
-    # Each ABI carries ~75 MB of Rust libs built with debuginfo; shipping all
-    # four made a 280 MB APK. Keep only FDROID_ABIS and drop debug sections
-    # (--strip-debug keeps the dynamic symbols JNI resolves).
+    # Each ABI carries ~75 MB of (already stripped) Rust libs, so shipping all
+    # four made a 280 MB APK. F-Droid picks APKs by ABI; keep FDROID_ABIS only.
     - name: Trim native libs
       env:
         FDROID_ABIS: arm64-v8a
@@ -87,8 +86,6 @@ jobs:
           abi=${abi%/}
           case " $FDROID_ABIS " in *" $abi "*) ;; *) rm -rf "$abi" ;; esac
         done
-        STRIP=$(ls "$ANDROID_NDK_HOME"/toolchains/llvm/prebuilt/*/bin/llvm-strip | head -n 1)
-        find . -name '*.so' -exec "$STRIP" --strip-debug {} +
         du -ah .
 
     - name: Set version
