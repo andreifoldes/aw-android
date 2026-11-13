@@ -2,9 +2,11 @@ name: F-Droid repo
 
 # Builds a release APK of this fork on every push to master, signs it with the
 # fork's own app key, wraps it in a signed F-Droid repo and publishes that repo
-# as a tarball on the rolling `fdroid-repo` GitHub release. The iemabot server
-# polls that release (scripts/fdroid/update-server-repo.sh) and serves it at
-# FDROID_REPO_URL. Keys live only in the `fdroid` environment (master only).
+# as a tarball on the rolling `fdroid-repo` GitHub release. The deploy job then
+# runs on the iemabot server's self-hosted runner (label iemabot-aw-deploy),
+# which installs that release with scripts/fdroid/update-server-repo.sh; Caddy
+# serves it at FDROID_REPO_URL. Keys live only in the `fdroid` environment
+# (master only).
 
 on:
   push:
@@ -173,3 +175,31 @@ jobs:
         # Version file last: the server only fetches the bundle once it changes.
         gh release upload "$RELEASE_TAG" fdroid-repo.tar.gz fdroid-repo.sha256 --clobber
         gh release upload "$RELEASE_TAG" fdroid-repo.version --clobber
+
+  deploy:
+    name: Deploy to iemabot
+    needs: publish
+    # The self-hosted runner sits on the production server and this repo is
+    # public: it carries only its own label, so no other job can land on it.
+    runs-on: iemabot-aw-deploy
+    environment: fdroid
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: scripts/fdroid
+        sparse-checkout-cone-mode: false
+
+    - name: Install the published repo
+      run: |
+        DEST=/srv/aw-fdroid sh scripts/fdroid/update-server-repo.sh
+        cat /srv/aw-fdroid/current/VERSION
+
+    - name: Check it is served
+      run: |
+        want=$(cut -d' ' -f1 /srv/aw-fdroid/current/VERSION)
+        curl -fsS --max-time 30 "$FDROID_REPO_URL/index-v1.json" |
+          python3 -c "import json,sys; d=json.load(sys.stdin); v=[p['versionCode'] for ps in d['packages'].values() for p in ps]; print('served versionCodes:', v); sys.exit(0 if int(sys.argv[1]) in v else 1)" "$want"

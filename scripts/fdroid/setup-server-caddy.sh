@@ -20,7 +20,7 @@ else
     awk -v anchor="$ANCHOR" '
         index($0, anchor) && !done {
             print "\t# --- ActivityWatch Android (andreifoldes fork) F-Droid repo, published"
-            print "\t#     by ~/aw-fdroid/update-server-repo.sh (cron) into /srv/aw-fdroid ---"
+            print "\t#     into /srv/aw-fdroid by the fdroid.yml deploy job (self-hosted runner) ---"
             print "\thandle_path /aw/fdroid/* {"
             print "\t\troot * /srv/aw-fdroid/current"
             print "\t\tfile_server"

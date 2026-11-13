@@ -1,7 +1,7 @@
 #!/bin/sh
 # Mirrors the signed F-Droid repo that .github/workflows/fdroid.yml publishes on
 # the `fdroid-repo` release into $DEST, which Caddy serves at /aw/fdroid/.
-# Meant for cron; does nothing unless the published version changed.
+# Run by the workflow's deploy job; does nothing unless the version changed.
 #
 #   DEST/releases/<versionCode>/repo/   one unpacked bundle per version
 #   DEST/current -> releases/<versionCode>   swapped atomically
