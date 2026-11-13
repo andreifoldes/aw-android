@@ -14,6 +14,8 @@ AABDIR = mobile/build/outputs/bundle
 
 WEBUI_SRCDIR := aw-server-rust/aw-webui
 WEBUI_DISTDIR := $(WEBUI_SRCDIR)/dist
+# Fork-only aw-webui changes, applied to the submodule before it is built.
+WEBUI_PATCHES := $(sort $(wildcard patches/aw-webui/*.patch))
 
 # NOTE: you have to download bundletool manually and set this path
 #		https://github.com/google/bundletool/releases
@@ -287,6 +289,13 @@ $(WEBUI_DISTDIR):
 		echo "Skipping aw-webui build, as SKIP_WEBUI is set"; \
 	else \
 		echo "Building aw-webui"; \
+		for p in $(WEBUI_PATCHES); do \
+			if git -C $(WEBUI_SRCDIR) apply --reverse --check "$$(pwd)/$$p" 2>/dev/null; then \
+				echo "Already applied: $$p"; \
+			else \
+				git -C $(WEBUI_SRCDIR) apply "$$(pwd)/$$p" || exit 1; \
+			fi; \
+		done; \
 		make --directory=aw-server-rust/aw-webui build; \
 	fi
 

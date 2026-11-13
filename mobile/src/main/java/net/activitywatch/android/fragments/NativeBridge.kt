@@ -28,6 +28,7 @@ internal const val NATIVE_BRIDGE_JS_OBJECT = "awNativeBridge"
 internal const val NATIVE_BRIDGE_VERSION = 1
 
 enum class NativeAction(val wireName: String) {
+    AUTOMATIONS("automations"),
     SYNC_SETTINGS("sync-settings"),
     AUTH_SETTINGS("auth-settings"),
     OPEN_IN_BROWSER("open-in-browser");

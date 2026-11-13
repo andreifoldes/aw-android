@@ -168,6 +168,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNativeAction(action: NativeAction) {
         when (action) {
+            NativeAction.AUTOMATIONS -> startActivity(Intent(this, AutomationsActivity::class.java))
             NativeAction.SYNC_SETTINGS -> startActivity(Intent(this, SyncSettingsActivity::class.java))
             NativeAction.AUTH_SETTINGS -> startActivity(Intent(this, AuthSettingsActivity::class.java))
             NativeAction.OPEN_IN_BROWSER -> openDashboardInBrowser()

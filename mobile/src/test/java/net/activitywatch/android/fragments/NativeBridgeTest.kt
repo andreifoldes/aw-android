@@ -49,6 +49,10 @@ class NativeBridgeTest {
     fun parsesAllowlistedMessages() {
         assertEquals(NativeBridgeMessage.Hello, parseNativeBridgeMessage("""{"type":"hello"}"""))
         assertEquals(
+            NativeBridgeMessage.Action(NativeAction.AUTOMATIONS),
+            parseNativeBridgeMessage("""{"type":"action","action":"automations"}"""),
+        )
+        assertEquals(
             NativeBridgeMessage.Action(NativeAction.SYNC_SETTINGS),
             parseNativeBridgeMessage("""{"type":"action","action":"sync-settings"}"""),
         )
@@ -88,7 +92,7 @@ class NativeBridgeTest {
         assertEquals(NATIVE_BRIDGE_VERSION, json.getInt("version"))
         val actions = json.getJSONArray("actions")
         assertEquals(
-            listOf("sync-settings", "auth-settings", "open-in-browser"),
+            listOf("automations", "sync-settings", "auth-settings", "open-in-browser"),
             (0 until actions.length()).map { actions.getString(it) },
         )
         assertEquals("close-menu", JSONObject(nativeCloseMenuMessage()).getString("type"))

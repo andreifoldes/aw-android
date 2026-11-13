@@ -1,0 +1,36 @@
+diff --git a/src/components/Header.vue b/src/components/Header.vue
+index 2972a82..6547a69 100644
+--- a/src/components/Header.vue
++++ b/src/components/Header.vue
+@@ -201,6 +201,7 @@ import 'vue-awesome/icons/layer-group';
+ import 'vue-awesome/icons/sync';
+ import 'vue-awesome/icons/key';
+ import 'vue-awesome/icons/external-link-alt';
++import 'vue-awesome/icons/bolt';
+ 
+ import _ from 'lodash';
+ 
+diff --git a/src/i18n/locales/en.ts b/src/i18n/locales/en.ts
+index 0fbcd99..6212b55 100644
+--- a/src/i18n/locales/en.ts
++++ b/src/i18n/locales/en.ts
+@@ -23,6 +23,7 @@ export default {
+     graph: 'Graph',
+     rawData: 'Raw Data',
+     settings: 'Settings',
++    automations: 'Automations',
+     syncSettings: 'Sync settings',
+     apiAuthentication: 'API authentication',
+     openInBrowser: 'Open in browser',
+diff --git a/src/util/nativeBridge.ts b/src/util/nativeBridge.ts
+index 056d82a..4d5d83a 100644
+--- a/src/util/nativeBridge.ts
++++ b/src/util/nativeBridge.ts
+@@ -9,6 +9,7 @@
+ export const NATIVE_BRIDGE_VERSION = 1;
+ 
+ export const NATIVE_MENU_ACTIONS = [
++  { id: 'automations', label: 'nav.automations', icon: 'bolt' },
+   { id: 'sync-settings', label: 'nav.syncSettings', icon: 'sync' },
+   { id: 'auth-settings', label: 'nav.apiAuthentication', icon: 'key' },
+   { id: 'open-in-browser', label: 'nav.openInBrowser', icon: 'external-link-alt' },
