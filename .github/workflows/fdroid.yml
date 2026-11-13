@@ -21,6 +21,7 @@ env:
   NDK_VERSION: '28.2.13676358'
   JAVA_VERSION: '17'
   APP_ID: net.activitywatch.android
+  APP_NAME: ActivityWatch-IFTTT
   RELEASE_TAG: fdroid-repo
   FDROID_REPO_URL: https://iemabot.surrey.ac.uk/aw/fdroid/repo
   # Above upstream's committed versionCode, so F-Droid always offers our build
@@ -129,6 +130,7 @@ jobs:
         mkdir -p metadata/$APP_ID repo/icons
         cp -r ../fastlane/metadata/android/en-US metadata/$APP_ID/en-US
         rm -rf metadata/$APP_ID/en-US/changelogs metadata/$APP_ID/en-US/video.txt
+        echo "$APP_NAME" > metadata/$APP_ID/en-US/title.txt
         cp ../fastlane/metadata/android/en-US/images/icon.png repo/icons/aw-fdroid.png
         cat > metadata/$APP_ID.yml <<EOF
         Categories:
@@ -138,11 +140,11 @@ jobs:
         WebSite: https://activitywatch.net
         SourceCode: https://github.com/andreifoldes/aw-android
         IssueTracker: https://github.com/andreifoldes/aw-android/issues
-        AutoName: ActivityWatch
+        Name: $APP_NAME
         EOF
         cat > config.yml <<EOF
         repo_url: $FDROID_REPO_URL
-        repo_name: ActivityWatch (iemabot)
+        repo_name: $APP_NAME
         repo_description: >-
           ActivityWatch for Android built from github.com/andreifoldes/aw-android,
           updated with every push to its master branch.
