@@ -28,7 +28,10 @@ concurrency:
 jobs:
   build-rust:
     name: Build aw-server-rust
-    runs-on: ubicloud-standard-8
+    # Ubicloud runners only exist for the ActivityWatch org. A fork sets the
+    # RUNNER_LARGE / RUNNER_MEDIUM repository variables (e.g. ubuntu-24.04)
+    # so these jobs don't queue forever.
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubicloud-standard-8' }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -124,7 +127,7 @@ jobs:
 
   build-apk:
     name: Build ${{ matrix.type }}
-    runs-on: ubicloud-standard-4
+    runs-on: ${{ vars.RUNNER_MEDIUM || 'ubicloud-standard-4' }}
     needs: [build-rust, get-versionCode]
     # Skip on fork PRs: signing secrets are not available and upload would fail anyway.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -132,6 +135,12 @@ jobs:
       fail-fast: true
       matrix:
         type: ['apk', 'aab']
+    env:
+      # Pin where AGP creates the debug keystore, which is also where
+      # scripts/sign_apk_debug.sh looks for it to re-sign per-ABI debug APKs.
+      # Without this the two can disagree on a runner image whose Android
+      # preferences dir isn't ~/.android (seen on GitHub-hosted ubuntu-24.04).
+      ANDROID_USER_HOME: ${{ github.workspace }}/.android-user
 
     steps:
     - uses: actions/checkout@v4
@@ -261,6 +270,7 @@ jobs:
         JKS_STOREPASS: ${{ secrets.KEY_ANDROID_JKS_STOREPASS }}
         JKS_KEYPASS: ${{ secrets.KEY_ANDROID_JKS_KEYPASS }}
       run: |
+        mkdir -p "$ANDROID_USER_HOME"
         if [ "${{ matrix.type }}" = apk ]; then
           # Per-ABI APKs first: signing dist/aw-android.apk moves the Gradle
           # output away, and build-apk-per-abi reads that same file (aw-android#61).
@@ -381,7 +391,7 @@ jobs:
     needs: [build-rust]
     #if: false  # disabled
     #runs-on: "macos-12"  # macOS-latest
-    runs-on: ubicloud-standard-8
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubicloud-standard-8' }}
     env:
       MATRIX_E_SDK: ${{ matrix.api-level }}
     strategy:
@@ -495,7 +505,7 @@ jobs:
   test-release-smoke:
     name: Test release variant (R8 smoke)
     needs: [build-rust]
-    runs-on: ubicloud-standard-8
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubicloud-standard-8' }}
     steps:
 
     - uses: actions/checkout@v4

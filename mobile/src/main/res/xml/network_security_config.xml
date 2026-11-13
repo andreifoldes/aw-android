@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- Cleartext is permitted at the platform level so that automations can call
+         http:// endpoints on the user's local network (home-automation hubs etc.),
+         which this config cannot express as IP ranges. The app enforces the actual
+         policy: automations send plain http:// only after the host resolves to a
+         local-network address (automation/LocalNetwork.kt, HttpActionRunner); the
+         dashboard's own requests stay on the on-device server (127.0.0.1). -->
+    <base-config cleartextTrafficPermitted="true" />
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">127.0.0.1</domain>
         <domain includeSubdomains="true">localhost</domain>

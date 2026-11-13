@@ -18,6 +18,9 @@ import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.activitywatch.android.automation.AppSessionMonitor
+import net.activitywatch.android.automation.AutomationDispatcher
+import net.activitywatch.android.automation.AutomationStore
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -71,6 +74,9 @@ class BackgroundService : Service() {
     // running server behind. `Service` has no `isDestroyed` before API 35.
     @Volatile
     private var serviceDestroyed = false
+
+    // Fires the user's app-session automations. Idle (no polling) unless a rule is enabled.
+    private var automationMonitor: AppSessionMonitor? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -208,6 +214,8 @@ class BackgroundService : Service() {
         // Schedule activity-time notifications (aw-notify)
         scheduleNotifyChecks()
 
+        startAutomationMonitor()
+
         isFullyStarted = true
         // A sticky recreation can occur while the app is backgrounded, where Android 12+
         // may reject foreground promotion. Only explicit, eligible callers restart us.
@@ -241,6 +249,16 @@ class BackgroundService : Service() {
                 )
             }
         }
+    }
+
+    private fun startAutomationMonitor() {
+        if (automationMonitor != null) return
+        val store = AutomationStore(this)
+        val dispatcher = AutomationDispatcher(this, store) {
+            // Runs on the dispatcher thread; getSetting blocks on the datastore.
+            awaitRustInterface()?.getSetting("classes")
+        }
+        automationMonitor = AppSessionMonitor(this, store, dispatcher).also { it.start() }
     }
 
     private fun awaitRustInterface(): RustInterface? =
@@ -374,6 +392,8 @@ class BackgroundService : Service() {
         Log.i(TAG, "BackgroundService destroyed")
         serviceDestroyed = true
         if (::syncScheduler.isInitialized) syncScheduler.stop()
+        automationMonitor?.stop()
+        automationMonitor = null
         super.onDestroy()
     }
 

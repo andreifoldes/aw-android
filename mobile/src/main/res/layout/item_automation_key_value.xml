@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One Shortcuts-style row: (-) [Key] [Type] [Value]. Used for headers and body fields;
+     the type picker is only shown for JSON body fields. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/btn_remove_row"
+        android:layout_width="36dp"
+        android:layout_height="40dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/automation_remove_row"
+        android:src="@drawable/ic_automation_remove_row" />
+
+    <EditText
+        android:id="@+id/et_row_key"
+        style="@style/AutomationField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="@string/automation_row_key_hint"
+        android:inputType="text|textNoSuggestions"
+        android:singleLine="true" />
+
+    <Spinner
+        android:id="@+id/spinner_row_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:background="@drawable/bg_automation_chip"
+        android:minHeight="0dp"
+        android:paddingStart="8dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp" />
+
+    <EditText
+        android:id="@+id/et_row_value"
+        style="@style/AutomationField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_weight="1.4"
+        android:hint="@string/automation_row_value_hint"
+        android:inputType="text|textNoSuggestions"
+        android:singleLine="true" />
+</LinearLayout>

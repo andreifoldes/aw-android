@@ -22,4 +22,18 @@
     <color name="widget_text_muted">#888888</color>
     <color name="widget_bar_bg">#E0E0E0</color>
     <color name="widget_icon_tint">#888888</color>
+
+    <!-- Automations editor: grouped "Shortcuts" style surfaces. -->
+    <color name="automation_screen_bg">#F2F2F7</color>
+    <color name="automation_card_bg">#FFFFFF</color>
+    <color name="automation_field_bg">#EFEFF4</color>
+    <color name="automation_divider">#DCDCE0</color>
+    <color name="automation_segment_track">#E4E4E9</color>
+    <color name="automation_segment_selected">#FFFFFF</color>
+    <color name="automation_chip_bg">#FBE3EC</color>
+    <color name="automation_chip_text">#C2185B</color>
+    <color name="automation_text_primary">#000000</color>
+    <color name="automation_text_secondary">#6D6D72</color>
+    <color name="automation_remove">#FF3B30</color>
+    <color name="automation_action_icon_bg">#1E88E5</color>
 </resources>

@@ -65,6 +65,19 @@
             android:theme="@style/AppTheme.FollowNight"
             android:exported="false"/>
 
+        <activity
+            android:name=".AutomationsActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.FollowNight"
+            android:exported="false"/>
+
+        <activity
+            android:name=".AutomationEditActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.FollowNight"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false"/>
+
         <receiver
             android:name=".watcher.AlarmReceiver"
             android:enabled="true"

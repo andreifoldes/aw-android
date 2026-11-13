@@ -22,6 +22,15 @@ For other platforms, see [activitywatch.net/downloads](https://activitywatch.net
 
 Install the app from the [Play Store](https://play.google.com/store/apps/details?id=net.activitywatch.android), [F-Droid](https://f-droid.org/en/packages/net.activitywatch.android/), or the [GitHub releases](https://github.com/ActivityWatch/aw-android/releases).
 
+### Automations (call a web API when an app opens or closes)
+
+Open the menu → **Automations** to set up Shortcuts-style WHEN/DO rules:
+
+- **WHEN** an app session *starts*, *ends*, or either, for **a specific app**, **an Android app category** (Games, Social, Video, …), **an ActivityWatch category** (from your own categorization rules, subcategories included), or **any app**. Close rules can ignore sessions shorter than a minimum length.
+- **DO** *Get contents of URL*, laid out like the iOS Shortcuts action: pick the method (`POST`/`GET`/`PUT`/`PATCH`/`DELETE`), add headers as key/value rows, and send the body as **JSON** (typed Text / Number / Boolean fields), a **Form**, or free **Text** for any other payload. Like iOS Shortcuts, `https://` works with any address and plain `http://` works on your local network (e.g. `http://192.168.1.10:8123`, `http://homeassistant.local:8123`); an `http://` request is only sent once its host resolves to a local-network address. Tap a variable chip (`App`, `Event`, `Category`, `Duration`, …) to insert it into the field you're editing; values are escaped for where they land. Use **Test** to send one right away.
+
+Detection uses the usage-access permission the app already has, checked every second by default (adjustable from 0.5 s to 10 s) while the screen is on and at least one automation is enabled. If you also enable the ActivityWatch accessibility service, app switches are picked up as they happen (typically well under a second). Each automation shows the result of its last run.
+
 ### For Oculus Quest
 
 > **Note** 

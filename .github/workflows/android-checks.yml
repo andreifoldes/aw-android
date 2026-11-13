@@ -1,0 +1,63 @@
+name: Android checks (GitHub-hosted)
+
+# Build.yml runs its heavy jobs on Ubicloud runners, which only exist for the
+# upstream ActivityWatch organization; on a fork those jobs stay queued forever.
+# This workflow runs the parts that need no Rust server build on GitHub-hosted
+# runners: the JVM unit tests and the R8-minified release build. The APK it
+# builds has no jniLibs and is not uploaded; it only proves the app compiles,
+# links its resources and survives R8.
+
+on:
+  push:
+    branches-ignore: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NDK_VERSION: '28.2.13676358'
+  JAVA_VERSION: '17'
+
+jobs:
+  checks:
+    name: Unit tests + release build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    # NDK is required at Gradle configuration time even for JVM unit tests.
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        packages: platform-tools
+    - name: Set up Android NDK
+      run: |
+        sdkmanager "ndk;${{ env.NDK_VERSION }}"
+        echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/${{ env.NDK_VERSION }}" >> $GITHUB_ENV
+
+    - name: Unit tests
+      run: ./gradlew testStandardDebugUnitTest
+
+    - name: Build release variant (exercises R8)
+      run: |
+        ./gradlew :mobile:assembleStandardRelease -x lintVitalStandardRelease
+        test -s mobile/build/outputs/mapping/standardRelease/mapping.txt
+
+    - name: Upload test reports
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: unit-test-reports
+        path: mobile/build/reports/tests/
